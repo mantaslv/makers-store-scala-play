@@ -93,9 +93,11 @@ Before you start modifying the test, ask yourself the following questions:
 
 
 Regarding validations for newly created users, we do not have a formal User Story from the team (shame!). However, Severus had a meeting with the product owner and then sent you a Slack message that reads:
-- Emails should adhere to [the following format](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/email)
-- Passwords should follow [this pattern](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/password)
+- Emails should adhere to [the following format](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/email#validation)
+- Passwords should follow [this pattern](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/password#validation)
 
+
+<!-- OMITTED -->
 
 
 

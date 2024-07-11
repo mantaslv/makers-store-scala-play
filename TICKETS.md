@@ -41,7 +41,7 @@ We would like our users to be able to add, remove and view items to their cart.
 **Location**
 
 The marketplace is so far global we can assume. However, we'd like to start
-targeting specific and advertising our products in these regions only.
+targeting specific regions and advertising our products in these regions only.
 
 For this, we'd need to introduce the concept of `Location` in our application.
 The idea is that we are able to:
@@ -70,3 +70,8 @@ process and simulating payment processing. Here are more detailed tasks:
 
 - [ ] Create an endpoint to initiate a payment. This endpoint should receive
   order details and return a confirmation.
+
+**Extension research**
+
+:bulb: How can you ensure payment info is as secure as possible? Should you use
+a third party?
