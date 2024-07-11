@@ -47,6 +47,11 @@ If you ask me, I think this term is great. Think about it this way: "As my
 project `evolves`, my database schema is likely to `evolve` as well alongside my
 project.
 
+**Note that the Play app is configured to detect and action database schema changes automatically when you run `sbt run`**.
+
+This means that if you add a new SQL script under `conf/evolutions/default`,
+after you run `sbt run`, Play should perform whatever action you've specified.
+
 
 ### Running the application and tests
 
