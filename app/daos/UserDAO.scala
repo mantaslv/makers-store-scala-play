@@ -17,9 +17,14 @@ class UserDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: E
   val users = Users.table
 
   def addUser(user: User): Future[Long] = {
-    val hashedPassword = BCrypt.hashpw(user.password, BCrypt.gensalt())
-    val userWithHashedPassword = user.copy(password = hashedPassword)
-    db.run(users returning users.map(_.id) += userWithHashedPassword)
+    if (user.isValid) {
+      val hashedPassword = BCrypt.hashpw(user.password, BCrypt.gensalt())
+      val userWithHashedPassword = user.copy(password = hashedPassword)
+      db.run(users returning users.map(_.id) += userWithHashedPassword)
+    } else {
+      Future.failed(new IllegalArgumentException("user data not valid"))
+    }
+
   }
 
   def findUserByUsername(username: String): Future[Option[User]] = {

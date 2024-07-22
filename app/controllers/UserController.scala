@@ -37,6 +37,7 @@ class UserController @Inject()(cc: ControllerComponents, userDAO: UserDAO)(impli
     userDAO.addUser(user).map { id =>
       Created(Json.obj("status" -> "success", "message" -> s"User $id created"))
     }.recover {
+      case e: IllegalArgumentException => BadRequest(Json.obj("status" -> "error", "message" -> "Email, username or password is invalid"))
       case _ => InternalServerError(Json.obj("status" -> "error", "message" -> "User could not be created"))
     }
   }

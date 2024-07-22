@@ -29,7 +29,7 @@ class UserControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
         .withJsonBody(Json.obj(
           "username" -> "testuser",
           "email" -> "test@example.com",
-          "password" -> "password")
+          "password" -> "Password$123")
         )
         .withCSRFToken
 
@@ -46,15 +46,49 @@ class UserControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
       maybeUser.get.email mustBe "test@example.com"
     }
 
-    "return bad request for invalid data" in {
+    "return bad request for invalid username" in {
       val userDAO = inject[UserDAO]
       val userController = new UserController(stubControllerComponents(), userDAO)(inject[ExecutionContext])
 
       val request = FakeRequest(POST, "/signUp")
         .withJsonBody(Json.obj(
           "username" -> "",
-          "email" -> "not-an-email",
-          "password" -> "")
+          "email" -> "test@example.com",
+          "password" -> "Password$123")
+        )
+        .withCSRFToken
+
+      val result = call(userController.signUp, request)
+
+      status(result) mustBe BAD_REQUEST
+    }
+
+    "return bad request for invalid email" in {
+      val userDAO = inject[UserDAO]
+      val userController = new UserController(stubControllerComponents(), userDAO)(inject[ExecutionContext])
+
+      val request = FakeRequest(POST, "/signUp")
+        .withJsonBody(Json.obj(
+          "username" -> "testuser2",
+          "email" -> "test@example",
+          "password" -> "Password$123")
+        )
+        .withCSRFToken
+
+      val result = call(userController.signUp, request)
+
+      status(result) mustBe BAD_REQUEST
+    }
+
+    "return bad request for invalid password" in {
+      val userDAO = inject[UserDAO]
+      val userController = new UserController(stubControllerComponents(), userDAO)(inject[ExecutionContext])
+
+      val request = FakeRequest(POST, "/signUp")
+        .withJsonBody(Json.obj(
+          "username" -> "testuser2",
+          "email" -> "test@example.com",
+          "password" -> "Password")
         )
         .withCSRFToken
 
