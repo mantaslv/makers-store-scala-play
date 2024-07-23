@@ -8,9 +8,6 @@ import scala.util.matching.Regex
 
 // User case class
 case class User(id: Option[Long], username: String, email: String, password: String) {
-  /*require(username.nonEmpty, "username cannot be blank")
-  require(email.contains("@"), "email does not contain @")
-  require(password.nonEmpty, "password cannot be blank")*/
   def isValid: Boolean = {
     val emailPattern: Regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$".r
     val passwordPattern: Regex = """^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%\^&\*\(\)_\+\-=\[\]{};':"\\|,.<>\/?]).+$""".r
