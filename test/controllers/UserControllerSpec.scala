@@ -58,82 +58,32 @@ class UserControllerSpec
       maybeUser.get.email mustBe "test@example.com"
     }
 
-    "return bad request for invalid username" in {
-      val userDAO = inject[UserDAO]
-      val userController = new UserController(stubControllerComponents(), userDAO)(inject[ExecutionContext])
-
-      val request = FakeRequest(POST, "/signUp")
-        .withJsonBody(Json.obj(
-          "username" -> "",
-          "email" -> "test@example.com",
-          "password" -> "Password$123")
-        )
-        .withCSRFToken
-
-      val result = call(userController.signUp, request)
-
-      status(result) mustBe BAD_REQUEST
-    }
-
-    /*"return bad request for invalid credentials" in {
+    "return bad request" when {
       val testCases = Table(
         ("test_desc", "username", "email", "password"),
-        ("bad email", "testuser2", "test@example", "Password$123")
+        ("invalid username", "", "test@example.com", "Password$123"),
+        ("invalid email", "testuser2", "test@example", "Password$123"),
+        ("invalid password", "testuser2", "test@example.com", "Password")
       )
 
       forAll(testCases) { (test_desc: String, username: String, email: String, password: String) =>
-        withClue(s"Test case: $test_desc") {
+        s"$test_desc" in {
+          val userDAO = inject[UserDAO]
+          val userController = new UserController(stubControllerComponents(), userDAO)(inject[ExecutionContext])
 
+          val request = FakeRequest(POST, "/signUp")
+            .withJsonBody(Json.obj(
+              "username" -> username,
+              "email" -> email,
+              "password" -> password)
+            )
+            .withCSRFToken
+
+          val result = call(userController.signUp, request)
+
+          status(result) mustBe BAD_REQUEST
         }
-        val userDAO = inject[UserDAO]
-        val userController = new UserController(stubControllerComponents(), userDAO)(inject[ExecutionContext])
-
-        val request = FakeRequest(POST, "/signUp")
-          .withJsonBody(Json.obj(
-            "username" -> username,
-            "email" -> email,
-            "password" -> password)
-          )
-          .withCSRFToken
-
-        val result = call(userController.signUp, request)
-
-        status(result) mustBe BAD_REQUEST
       }
-    }*/
-
-    "return bad request for invalid email" in {
-      val userDAO = inject[UserDAO]
-      val userController = new UserController(stubControllerComponents(), userDAO)(inject[ExecutionContext])
-
-      val request = FakeRequest(POST, "/signUp")
-        .withJsonBody(Json.obj(
-          "username" -> "testuser2",
-          "email" -> "test@example",
-          "password" -> "Password$123")
-        )
-        .withCSRFToken
-
-      val result = call(userController.signUp, request)
-
-      status(result) mustBe BAD_REQUEST
-    }
-
-    "return bad request for invalid password" in {
-      val userDAO = inject[UserDAO]
-      val userController = new UserController(stubControllerComponents(), userDAO)(inject[ExecutionContext])
-
-      val request = FakeRequest(POST, "/signUp")
-        .withJsonBody(Json.obj(
-          "username" -> "testuser2",
-          "email" -> "test@example.com",
-          "password" -> "Password")
-        )
-        .withCSRFToken
-
-      val result = call(userController.signUp, request)
-
-      status(result) mustBe BAD_REQUEST
     }
   }
 }
