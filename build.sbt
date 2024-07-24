@@ -14,7 +14,7 @@ libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "42.7.2", // PostgreSQL driver
   "org.mindrot" % "jbcrypt" % "0.4",
   "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.1" % Test,
-  "org.scalatestplus" %% "selenium-4-21" % "3.2.19.0" % "test"
+  "org.scalatestplus" %% "selenium-4-21" % "3.2.19.0" % Test
 )
 
 // Set the config.file system property for tests

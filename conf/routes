@@ -7,7 +7,7 @@
 GET     /                           controllers.HomeController.index()
 GET     /signup                     controllers.UserController.showSignUpForm()
 POST    /signup                     controllers.UserController.signUp()
-
+GET     /items                      controllers.ItemsController.index()
 POST    /login                      controllers.UserController.logIn()
 # GET/    /login                      controllers.UserController.showLogInForm()
 
