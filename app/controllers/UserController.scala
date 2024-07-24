@@ -42,6 +42,10 @@ class UserController @Inject()(cc: ControllerComponents, userDAO: UserDAO)(impli
     }
   }
 
+  def showLogInForm = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.login(""))
+  }
+
   def logIn = Action.async(parse.json) { implicit request =>
     (request.body \ "username").asOpt[String].zip((request.body \ "password").asOpt[String]).map {
       case (username, password) =>
