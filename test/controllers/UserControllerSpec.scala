@@ -23,8 +23,8 @@ class UserControllerSpec
     with BeforeAndAfterEach
     with TableDrivenPropertyChecks {
 
-  def fakeApp(): Application = new GuiceApplicationBuilder().build()
-  lazy val database: Database = fakeApp().injector.instanceOf[DBApi].database("default")
+  lazy val fakeApp: Application = new GuiceApplicationBuilder().build()
+  lazy val database: Database = fakeApp.injector.instanceOf[DBApi].database("default")
 
   override def beforeEach(): Unit = {
     Evolutions.cleanupEvolutions(database)
