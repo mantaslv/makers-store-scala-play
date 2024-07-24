@@ -9,11 +9,12 @@ scalaVersion := "2.13.14"
 
 libraryDependencies ++= Seq(
   guice,
-  "org.playframework" %% "play-slick"            % "6.1.0",
+  "org.playframework" %% "play-slick"            % "6.1.1",
   "org.playframework" %% "play-slick-evolutions" % "6.1.0",
-  "org.postgresql" % "postgresql" % "42.5.1", // PostgreSQL driver
+  "org.postgresql" % "postgresql" % "42.7.2", // PostgreSQL driver
   "org.mindrot" % "jbcrypt" % "0.4",
-  "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.1" % Test
+  "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.1" % Test,
+  "org.scalatestplus" %% "selenium-4-21" % "3.2.19.0" % "test"
 )
 
 // Set the config.file system property for tests
