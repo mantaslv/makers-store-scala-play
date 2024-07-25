@@ -52,6 +52,7 @@ class UserController @Inject()(cc: ControllerComponents, userDAO: UserDAO)(impli
         userDAO.findUserByUsername(username).map {
           case Some(user) if BCrypt.checkpw(password, user.password) =>
             Ok(Json.obj("status" -> "success", "message" -> "Logged in"))
+          case None => Unauthorized(Json.obj("status" -> "error", "message" -> "No user found"))
           case _ => Unauthorized(Json.obj("status" -> "error", "message" -> "Invalid credentials"))
         }
     }.getOrElse(Future.successful(BadRequest("Invalid login data")))

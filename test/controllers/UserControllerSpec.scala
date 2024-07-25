@@ -90,10 +90,7 @@ class UserControllerSpec
   }
 
   "UserController POST /logIn" should {
-    "succesfully log in a user" in {
-      val userDAO = inject[UserDAO]
-      val userController = new UserController(stubControllerComponents(), userDAO)(inject[ExecutionContext])
-
+    def createUserInDB(): Unit ={
       val connection = database.getConnection()
       try {
         val sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?);"
@@ -107,6 +104,13 @@ class UserControllerSpec
       } finally {
         if (connection != null) connection.close()
       }
+    }
+
+    "succesfully log in a user" in {
+      val userDAO = inject[UserDAO]
+      val userController = new UserController(stubControllerComponents(), userDAO)(inject[ExecutionContext])
+
+      createUserInDB()
 
       val request = FakeRequest(POST, "/logIn")
         .withJsonBody(Json.obj(
@@ -121,6 +125,37 @@ class UserControllerSpec
       val jsonResponse = contentAsJson(result)
       (jsonResponse \ "status").as[String] mustBe "success"
       (jsonResponse \ "message").as[String] must include("Logged in")
+    }
+
+    "return unauthorized" when {
+      val testCases = Table(
+        ("test_desc", "username", "password"),
+        ("No user found", "testuser2", "Password$123"),
+        ("Invalid credentials", "testuser", "Password$12"),
+      )
+
+      forAll(testCases) { (test_desc: String, username: String, password: String) =>
+        s"$test_desc" in {
+          val userDAO = inject[UserDAO]
+          val userController = new UserController(stubControllerComponents(), userDAO)(inject[ExecutionContext])
+
+          createUserInDB()
+
+          val request = FakeRequest(POST, "/signUp")
+            .withJsonBody(Json.obj(
+              "username" -> username,
+              "password" -> password)
+            )
+            .withCSRFToken
+
+          val result = call(userController.logIn, request)
+
+          status(result) mustBe UNAUTHORIZED
+          val jsonResponse = contentAsJson(result)
+          (jsonResponse \ "status").as[String] mustBe "error"
+          (jsonResponse \ "message").as[String] must include(s"$test_desc")
+        }
+      }
     }
   }
 }
