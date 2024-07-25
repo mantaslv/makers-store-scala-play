@@ -1,8 +1,14 @@
-@()(implicit request: RequestHeader)
+@(maybeUsername: Option[String])(implicit request: RequestHeader)
 
 @main("The Makers Store") {
   <h1 id="index-heading">Welcome to The Makers Store!</h1>
-  <a href="/login">Log In</a>
-  <a href="/signup">Sign Up</a>
+
   <a href="/items">Items</a>
+
+  @if(Some(maybeUsername)) {
+    <h4>@maybeUsername is signed in</h4>
+  } else {
+    <a href="/logIn">Log In</a>
+    <a href="/signUp">Sign Up</a>
+  }
 }
