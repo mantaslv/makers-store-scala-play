@@ -10,11 +10,14 @@ import play.api.test.CSRFTokenHelper.CSRFRequest
 import play.api.test.Helpers._
 import play.api.test._
 import org.scalatest.BeforeAndAfterEach
+
 import scala.concurrent.ExecutionContext
 import play.api.db.{DBApi, Database}
 import play.api.db.evolutions._
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.Application
+
+import java.sql.SQLException
 
 class UserControllerSpec
   extends PlaySpec
@@ -32,7 +35,6 @@ class UserControllerSpec
   }
 
   "UserController POST /signUp" should {
-
     "create a new user" in {
       val userDAO = inject[UserDAO]
       val userController = new UserController(stubControllerComponents(), userDAO)(inject[ExecutionContext])
@@ -84,6 +86,41 @@ class UserControllerSpec
           status(result) mustBe BAD_REQUEST
         }
       }
+    }
+  }
+
+  "UserController POST /logIn" should {
+    "succesfully log in a user" in {
+      val userDAO = inject[UserDAO]
+      val userController = new UserController(stubControllerComponents(), userDAO)(inject[ExecutionContext])
+
+      val connection = database.getConnection()
+      try {
+        val sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?);"
+        val statement = connection.prepareStatement(sql)
+        statement.setString(1, "testuser")
+        statement.setString(2, "test@example.com")
+        statement.setString(3, "$2a$10$waLr92BAywvbIuD3xNJO1O4FBlnFyvlSl7JuOKt1XA4PirMyB5DPW")
+        statement.executeUpdate()
+      } catch {
+        case e: SQLException => e.printStackTrace()
+      } finally {
+        if (connection != null) connection.close()
+      }
+
+      val request = FakeRequest(POST, "/logIn")
+        .withJsonBody(Json.obj(
+          "username" -> "testuser",
+          "password" -> "Password$123")
+        )
+        .withCSRFToken
+
+      val result = call(userController.logIn, request)
+
+      status(result) mustBe OK
+      val jsonResponse = contentAsJson(result)
+      (jsonResponse \ "status").as[String] mustBe "success"
+      (jsonResponse \ "message").as[String] must include("Logged in")
     }
   }
 }
