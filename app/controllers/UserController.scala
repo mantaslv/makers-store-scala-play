@@ -55,10 +55,10 @@ class UserController @Inject()(cc: ControllerComponents, userDAO: UserDAO)(impli
       case (username, password) =>
         userDAO.findUserByUsername(username).map {
           case Some(user) if BCrypt.checkpw(password, user.password) =>
-            val expirationTime = Instant.now().plus(30, ChronoUnit.MINUTES).toEpochMilli
+            // val expirationTime = Instant.now().plus(30, ChronoUnit.MINUTES).toEpochMilli
             Ok(Json.obj("status" -> "success", "message" -> "Logged in")).withSession(
               "user" -> username,
-              "expires" -> expirationTime.toString
+              // "expires" -> expirationTime.toString
             )
           case None => Unauthorized(Json.obj("status" -> "error", "message" -> "No user found"))
           case _ => Unauthorized(Json.obj("status" -> "error", "message" -> "Invalid credentials"))
