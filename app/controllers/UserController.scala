@@ -4,11 +4,15 @@ import javax.inject._
 import play.api.mvc._
 import daos.UserDAO
 import models.User
+
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.json._
 import play.api.data._
 import play.api.data.Forms._
 import org.mindrot.jbcrypt.BCrypt
+
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 @Singleton
 class UserController @Inject()(cc: ControllerComponents, userDAO: UserDAO)(implicit ec: ExecutionContext) extends AbstractController(cc) {
@@ -51,10 +55,18 @@ class UserController @Inject()(cc: ControllerComponents, userDAO: UserDAO)(impli
       case (username, password) =>
         userDAO.findUserByUsername(username).map {
           case Some(user) if BCrypt.checkpw(password, user.password) =>
-            Ok(Json.obj("status" -> "success", "message" -> "Logged in")).withSession("user" -> username)
+            val expirationTime = Instant.now().plus(30, ChronoUnit.MINUTES).toEpochMilli
+            Ok(Json.obj("status" -> "success", "message" -> "Logged in")).withSession(
+              "user" -> username,
+              "expires" -> expirationTime.toString
+            )
           case None => Unauthorized(Json.obj("status" -> "error", "message" -> "No user found"))
           case _ => Unauthorized(Json.obj("status" -> "error", "message" -> "Invalid credentials"))
         }
     }.getOrElse(Future.successful(BadRequest("Invalid login data")))
+  }
+
+  def logOut = Action { implicit request: Request[AnyContent] =>
+    Redirect(routes.HomeController.index()).withNewSession.flashing("success" -> "You've been logged out")
   }
 }

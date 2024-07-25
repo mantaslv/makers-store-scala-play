@@ -34,6 +34,22 @@ class UserControllerSpec
     Evolutions.applyEvolutions(database)
   }
 
+  def createUserInDB(): Unit ={
+    val connection = database.getConnection()
+    try {
+      val sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?);"
+      val statement = connection.prepareStatement(sql)
+      statement.setString(1, "testuser")
+      statement.setString(2, "test@example.com")
+      statement.setString(3, "$2a$10$waLr92BAywvbIuD3xNJO1O4FBlnFyvlSl7JuOKt1XA4PirMyB5DPW")
+      statement.executeUpdate()
+    } catch {
+      case e: SQLException => e.printStackTrace()
+    } finally {
+      if (connection != null) connection.close()
+    }
+  }
+
   "UserController POST /signUp" should {
     "create a new user" in {
       val userDAO = inject[UserDAO]
@@ -90,22 +106,6 @@ class UserControllerSpec
   }
 
   "UserController POST /logIn" should {
-    def createUserInDB(): Unit ={
-      val connection = database.getConnection()
-      try {
-        val sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?);"
-        val statement = connection.prepareStatement(sql)
-        statement.setString(1, "testuser")
-        statement.setString(2, "test@example.com")
-        statement.setString(3, "$2a$10$waLr92BAywvbIuD3xNJO1O4FBlnFyvlSl7JuOKt1XA4PirMyB5DPW")
-        statement.executeUpdate()
-      } catch {
-        case e: SQLException => e.printStackTrace()
-      } finally {
-        if (connection != null) connection.close()
-      }
-    }
-
     "succesfully log in a user" in {
       val userDAO = inject[UserDAO]
       val userController = new UserController(stubControllerComponents(), userDAO)(inject[ExecutionContext])
@@ -157,6 +157,30 @@ class UserControllerSpec
           (jsonResponse \ "message").as[String] must include(s"$test_desc")
         }
       }
+    }
+  }
+
+  "UserController GET /logOut" should {
+    "succesfully logout a user" in {
+      val userDAO = inject[UserDAO]
+      val userController = new UserController(stubControllerComponents(), userDAO)(inject[ExecutionContext])
+
+      createUserInDB()
+
+      FakeRequest(POST, "/logIn")
+        .withJsonBody(Json.obj(
+          "username" -> "testuser",
+          "password" -> "Password$123")
+        )
+        .withCSRFToken
+
+      val request = FakeRequest(GET, "/logOut")
+
+      val result = call(userController.logOut, request)
+
+      session(result).get("user") mustBe None
+      redirectLocation(result) mustBe Some(routes.HomeController.index().url)
+      flash(result).get("success") mustBe Some("You've been logged out")
     }
   }
 }

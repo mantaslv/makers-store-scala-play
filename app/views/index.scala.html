@@ -4,11 +4,14 @@
   <h1 id="index-heading">Welcome to The Makers Store!</h1>
 
   <a href="/items">Items</a>
-
-  @if(Some(maybeUsername)) {
-    <h4>@maybeUsername is signed in</h4>
-  } else {
-    <a href="/logIn">Log In</a>
-    <a href="/signUp">Sign Up</a>
+  @maybeUsername match {
+    case Some(username) => {
+      <h4>@username is signed in</h4>
+      <a href="/logOut">Log Out</a>
+    }
+    case None => {
+      <a href="/login">Log In</a>
+      <a href="/signup">Sign Up</a>
+    }
   }
 }
