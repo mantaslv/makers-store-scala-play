@@ -125,6 +125,7 @@ class UserControllerSpec
       val jsonResponse = contentAsJson(result)
       (jsonResponse \ "status").as[String] mustBe "success"
       (jsonResponse \ "message").as[String] must include("Logged in")
+      session(result).get("user") mustBe Some("testuser")
     }
 
     "return unauthorized" when {
