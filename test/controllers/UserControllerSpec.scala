@@ -161,7 +161,7 @@ class UserControllerSpec
   }
 
   "UserController GET /logOut" should {
-    "succesfully logout a user" in {
+    "successfully logout a user" in {
       val userDAO = inject[UserDAO]
       val userController = new UserController(stubControllerComponents(), userDAO)(inject[ExecutionContext])
 
